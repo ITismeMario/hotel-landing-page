@@ -38,4 +38,11 @@ const validateCreateUser = [
 	},
 ];
 
-module.exports = { validateCreateUser };
+const validateLogin = [
+	check('email').exists({ checkFalsy: true }).withMessage('You need to provide an e-mail'),
+	check('password').exists({ checkFalsy: true }).withMessage('You need to provide a password'),
+	(req, res, next) => {
+		validateResult(req, res, next);
+	},
+];
+module.exports = { validateCreateUser, validateLogin };

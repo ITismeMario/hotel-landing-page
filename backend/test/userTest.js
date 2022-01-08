@@ -18,7 +18,7 @@ const registerTestData = {
 		{ firstName: faker.random.words(), email: faker.internet.email(), password: faker.random.words() },
 		{ firstName: faker.random.words(), lastName: faker.random.words(), password: faker.random.words() },
 	],
-	badUser1: {
+	badEmailUser: {
 		firstName: faker.random.words(),
 		lastName: faker.random.words(),
 		email: 'unittestinguser@friendsbook.com', //email already in use
@@ -32,7 +32,22 @@ const registerTestData = {
 	},
 };
 
-describe('*********Users*********', () => {
+const loginTestData = {
+	goodUser: {
+		email: 'unittestinguser@friendsbook.com',
+		password: "Abcd'1234",
+	},
+	badPasswordUser: {
+		email: 'user1@friendsbook.com',
+		password: 'WRONG_PASSWORD',
+	},
+	badEmailUser: {
+		email: 'UNEXISTING_EMAIL@friendsbook.com',
+		password: "Abcd'1234",
+	},
+};
+
+describe('********* Users *********', () => {
 	// REGISTER user
 	describe('/POST register user', () => {
 		registerTestData.incompleteUsers.map((user) => {
@@ -52,7 +67,7 @@ describe('*********Users*********', () => {
 		it('it should NOT POST an user with an email already in the Data Base', (done) => {
 			chai.request(server)
 				.post('/api/users/register')
-				.send(registerTestData.badUser1)
+				.send(registerTestData.badEmailUser)
 				.end((err, res) => {
 					res.should.have.status(403);
 					res.body.should.be.an('object');
@@ -71,6 +86,42 @@ describe('*********Users*********', () => {
 					res.body.should.include.keys('_id', 'firstName', 'lastName', 'email', 'token');
 					createdDocumentID.push(res.body._id);
 					createdDocumentJWT.push(res.body.token);
+					done();
+				});
+		});
+	});
+
+	//LOGIN
+	describe('/POST login', () => {
+		it('it should GET a token for the user', (done) => {
+			chai.request(server)
+				.post('/api/users/login')
+				.send(loginTestData.goodUser)
+				.end((err, res) => {
+					res.should.have.status(200);
+					res.body.should.be.an('object');
+					res.body.should.have.property('token');
+					loginTestData.goodUser.token = res.body.token;
+					done();
+				});
+		});
+
+		it('it should reject the login because of a bad password', (done) => {
+			chai.request(server)
+				.post('/api/users/login')
+				.send(loginTestData.badPasswordUser)
+				.end((err, res) => {
+					res.should.have.status(400);
+					done();
+				});
+		});
+
+		it('it should reject the login because of an unexisting email', (done) => {
+			chai.request(server)
+				.post('/api/users/login')
+				.send(loginTestData.badEmailUser)
+				.end((err, res) => {
+					res.should.have.status(400);
 					done();
 				});
 		});
