@@ -4,6 +4,7 @@ const dotenv = require('dotenv');
 const morgan = require('morgan');
 const helmet = require('helmet');
 const connectDB = require('./config/db');
+const userRoutes = require('./routes/userRoutes');
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -13,6 +14,7 @@ app.use(helmet());
 app.use(morgan('common'));
 
 connectDB();
+app.use('/api/users', userRoutes);
 
 app.get('/', (req, res) => {
 	res.send('Server running');
