@@ -101,4 +101,19 @@ const validateUpdateUser = [
 	},
 ];
 
-module.exports = { validateCreateUser, validateLogin, validateUpdateUser };
+const validateDeleteUser = [
+	header('Authorization')
+		.exists()
+		.withMessage('No token')
+		.customSanitizer((authorization) => {
+			let sanitizedToken = authorization.split(' ')[1];
+			return sanitizedToken;
+		})
+		.isJWT()
+		.withMessage('No valid token was recieved'),
+	(req, res, next) => {
+		validateResult(req, res, next);
+	},
+];
+
+module.exports = { validateCreateUser, validateLogin, validateUpdateUser, validateDeleteUser };

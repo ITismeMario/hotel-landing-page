@@ -77,4 +77,18 @@ const updateUserProfile = asyncHandler(async (req, res) => {
 	}
 });
 
-module.exports = { registerUser, loginUser, updateUserProfile };
+const deleteUser = asyncHandler(async (req, res) => {
+	const user = await User.findById(req.user._id);
+
+	if (user) {
+		const userId = user._id.toString();
+		try {
+			await User.findByIdAndDelete(userId);
+			res.status(200).json({ Id: userId, message: 'Account deleted successfully' });
+		} catch (err) {
+			return res.status(403).json(err);
+		}
+	} else return res.status(404).json('No account matched the data');
+});
+
+module.exports = { registerUser, loginUser, updateUserProfile, deleteUser };

@@ -172,7 +172,7 @@ describe('********* Users *********', () => {
 		});
 
 		it('it should NOT UPDATE the user email with an email already in use by another user', (done) => {
-			const goodToken = createdDocumentJWT.slice(-1).pop();
+			const goodToken = createdDocumentJWT.slice(-1); //No .pop() because this one will fail and wont recieve a new token
 			chai.request(server)
 				.post('/api/users/profile')
 				.set('Authorization', `Bearer ${goodToken}`)
@@ -181,7 +181,30 @@ describe('********* Users *********', () => {
 					res.should.have.status(403);
 					res.body.should.be.an('object');
 					res.body.should.have.property('errors');
-					createdDocumentJWT.push(res.body.token);
+					done();
+				});
+		});
+	});
+
+	describe('DELETE  user', () => {
+		it('it should NOT DELETE an user with an invalid JWT', (done) => {
+			const badToken = 'Definitely.Not.A.Good.JWT';
+			chai.request(server)
+				.delete('/api/users/delete')
+				.set('Authorization', `Bearer ${badToken}`)
+				.end((error, res) => {
+					res.should.have.status(401);
+					done();
+				});
+		});
+
+		it('it should DELETE the user given its JWT', (done) => {
+			const goodToken = createdDocumentJWT.slice(-1).pop();
+			chai.request(server)
+				.delete('/api/users/delete')
+				.set('Authorization', `Bearer ${goodToken}`)
+				.end((error, res) => {
+					res.should.have.status(200);
 					done();
 				});
 		});
