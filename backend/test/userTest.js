@@ -47,6 +47,20 @@ const loginTestData = {
 	},
 };
 
+const UpdateTestData = {
+	goodUser: {
+		firstName: 'Test1Updated',
+		lastName: 'User1Updated',
+		email: 'updatedUser@friendsbook.com',
+		password: "Abcd'1234",
+		role: 'user',
+	},
+	badEmailUser: {
+		firstName: 'dummyUser',
+		email: 'unittestinguser@friendsbook.com', //email already in use
+	},
+};
+
 describe('********* Users *********', () => {
 	// REGISTER user
 	describe('/POST register user', () => {
@@ -122,6 +136,52 @@ describe('********* Users *********', () => {
 				.send(loginTestData.badEmailUser)
 				.end((err, res) => {
 					res.should.have.status(400);
+					done();
+				});
+		});
+	});
+
+	// ***UPDATE user***
+	describe('POST update user', () => {
+		it('it should UPDATE an user given the JWT', (done) => {
+			const goodToken = createdDocumentJWT.slice(-1).pop();
+			chai.request(server)
+				.post('/api/users/profile')
+				.set('Authorization', `Bearer ${goodToken}`)
+				.send(UpdateTestData.goodUser)
+				.end((error, res) => {
+					res.should.have.status(200);
+					res.body.should.be.an('object');
+					res.body.should.have.property('token');
+					res.body.should.include.keys('_id', 'email');
+					createdDocumentJWT.push(res.body.token);
+					done();
+				});
+		});
+
+		it('it should NOT UPDATE an user with an invalid JWT', (done) => {
+			const badToken = 'Definitely.Not.A.Good.JWT';
+			chai.request(server)
+				.post('/api/users/profile')
+				.set('Authorization', `${badToken}`)
+				.send(UpdateTestData.goodUser)
+				.end((error, res) => {
+					res.should.have.status(401);
+					done();
+				});
+		});
+
+		it('it should NOT UPDATE the user email with an email already in use by another user', (done) => {
+			const goodToken = createdDocumentJWT.slice(-1).pop();
+			chai.request(server)
+				.post('/api/users/profile')
+				.set('Authorization', `Bearer ${goodToken}`)
+				.send(UpdateTestData.badEmailUser)
+				.end((error, res) => {
+					res.should.have.status(403);
+					res.body.should.be.an('object');
+					res.body.should.have.property('errors');
+					createdDocumentJWT.push(res.body.token);
 					done();
 				});
 		});

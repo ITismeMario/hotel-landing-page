@@ -1,6 +1,7 @@
 const User = require('../models/userModel');
-const { check, header } = require('express-validator');
+const { check, header, body } = require('express-validator');
 const { validateResult } = require('../helpers/validationHelper');
+const jwt = require('jsonwebtoken');
 
 const validateCreateUser = [
 	check('firstName')
@@ -45,4 +46,51 @@ const validateLogin = [
 		validateResult(req, res, next);
 	},
 ];
-module.exports = { validateCreateUser, validateLogin };
+
+const validateUpdateUser = [
+	header('Authorization').exists().withMessage('No token recieved'),
+	check('firstName')
+		.exists()
+		.withMessage('You need enter your first name')
+		.isLength({ min: 2 })
+		.withMessage('The field First Name must be at least 2 digits long'),
+	check('lastName', '')
+		.exists()
+		.withMessage('You need enter your last name')
+		.isLength({ min: 2 })
+		.withMessage('The field Last Name must be at least 2 digits long'),
+	check('email')
+		.exists()
+		.withMessage('You need enter an email')
+		.bail()
+		.isEmail()
+		.normalizeEmail()
+		.custom(async (email, { req }) => {
+			//Getting the id from the JWT and compare if the requester.id an the user with the email (already in use) are the same person
+			let token = req.headers.authorization.split(' ')[1];
+
+			const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+			if (!decodedToken) throw new Error('The recieved token is corrupt');
+
+			const userWithThatEmail = await User.findOne({ email });
+			if (userWithThatEmail && userWithThatEmail._id.toString() !== decodedToken.id.toString()) {
+				throw new Error('that email is unavailable');
+			}
+			return true;
+		})
+		.withMessage('That email is in use by another user')
+		.bail(),
+	check('password')
+		.exists()
+		.withMessage('You need to enter a password')
+		.isStrongPassword()
+		.withMessage(
+			'The password must be at least 8 digits long and contain at least 1 of each of the following type of digits: lowercase,  uppercase, number, symbols'
+		),
+	check('role').exists().isIn(['user', 'admin']).withMessage('Invalid role'),
+	(req, res, next) => {
+		validateResult(req, res, next);
+	},
+];
+
+module.exports = { validateCreateUser, validateLogin, validateUpdateUser };
