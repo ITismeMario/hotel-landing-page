@@ -2,7 +2,7 @@ const asyncHandler = require('express-async-handler');
 const Room = require('../models/roomModel');
 
 const createRoom = asyncHandler(async (req, res) => {
-	const { name, images, description, price, details, services } = req.body;
+	const { name, images, description, price, details, amenities, services } = req.body;
 
 	const room = await Room.create({
 		name,
@@ -10,17 +10,19 @@ const createRoom = asyncHandler(async (req, res) => {
 		description,
 		price,
 		details,
+		amenities,
 		services,
 	});
 
 	if (room) {
 		res.status(201).json({
-			id: room._id,
+			_id: room._id,
 			name: room.name,
 			images: room.images,
 			description: room.description,
 			price: room.price,
 			details: room.details,
+			amenities: room.amenities,
 			services: room.services,
 		});
 	} else {

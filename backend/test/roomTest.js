@@ -170,8 +170,8 @@ describe('********* Rooms *********', () => {
 			.end((err, res) => {
 				res.should.have.status(201);
 				res.body.should.be.an('object');
-				res.body.should.include.keys('id');
-				createdDocumentID.push(res.body.id);
+				res.body.should.include.keys('_id');
+				createdDocumentID.push(res.body._id);
 				done();
 			});
 	});
