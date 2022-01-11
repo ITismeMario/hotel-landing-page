@@ -17,7 +17,7 @@ const roomSchema = new mongoose.Schema(
 		description: { type: String, required: true },
 		price: { type: Number },
 		details: [roomDetailsSchema],
-		services: [roomAmenitiesSchema],
+		amenities: [roomAmenitiesSchema],
 	},
 	{ timestamps: true }
 );
