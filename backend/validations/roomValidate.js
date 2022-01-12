@@ -1,5 +1,5 @@
 const Room = require('../models/roomModel');
-const { check, body } = require('express-validator');
+const { check, param } = require('express-validator');
 const { validateResult } = require('../helpers/validationHelper');
 
 /**
@@ -59,4 +59,20 @@ const validateCreateRoom = [
 	},
 ];
 
-module.exports = { validateCreateRoom };
+const validateGetRoom = [
+	param('id')
+		.exists()
+		.withMessage('Debe proporcionar una habitación')
+		.custom((id) => {
+			const mongoID = id.isMongoId();
+			console.log(`___ID___: ${mongoID}`);
+			if (mongoID) return true;
+			else {
+				throw new Error('Room not found');
+			}
+		})
+		.withMessage('Id inválido'),
+	// .isMongoId().withMessage('La habitación proporcionada no es válida'),
+];
+
+module.exports = { validateCreateRoom, validateGetRoom };

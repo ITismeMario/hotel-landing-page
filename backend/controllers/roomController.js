@@ -31,4 +31,19 @@ const createRoom = asyncHandler(async (req, res) => {
 	}
 });
 
-module.exports = { createRoom };
+const getRoom = asyncHandler(async (req, res) => {
+	try {
+		const room = await Room.findById(req.params.id);
+
+		if (room) res.status(201).json(room);
+		else {
+			res.status(404);
+			throw new Error('Room not found');
+		}
+	} catch (error) {
+		if (error.name === 'CastError') throw new Error('Id inválido');
+		else throw new Error(error.message);
+	}
+});
+
+module.exports = { createRoom, getRoom };
