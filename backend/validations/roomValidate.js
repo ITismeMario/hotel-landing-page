@@ -1,5 +1,5 @@
 const Room = require('../models/roomModel');
-const { check, body } = require('express-validator');
+const { check, param } = require('express-validator');
 const { validateResult } = require('../helpers/validationHelper');
 
 /**
@@ -59,4 +59,11 @@ const validateCreateRoom = [
 	},
 ];
 
-module.exports = { validateCreateRoom };
+const validateGetRoom = [
+	param('id').exists().withMessage('Debe de proporcionar un Id').isMongoId().withMessage('Id inválido'), //403
+	(req, res, next) => {
+		validateResult(req, res, next);
+	},
+];
+
+module.exports = { validateCreateRoom, validateGetRoom };

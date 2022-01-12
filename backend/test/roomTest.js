@@ -170,8 +170,8 @@ describe('********* Rooms *********', () => {
 			.end((err, res) => {
 				res.should.have.status(201);
 				res.body.should.be.an('object');
-				res.body.should.include.keys('id');
-				createdDocumentID.push(res.body.id);
+				res.body.should.include.keys('_id');
+				createdDocumentID.push(res.body._id);
 				done();
 			});
 	});
@@ -198,6 +198,19 @@ describe('********* Rooms *********', () => {
 				res.should.have.status(403);
 				res.body.should.be.an('object');
 				res.body.should.have.property('errors');
+				done();
+			});
+	});
+
+	//GET ROOM
+	it('it should GET a room', (done) => {
+		const id = createdDocumentID.slice(-1).pop();
+		chai.request(server)
+			.get(`/api/rooms/${id}`)
+			.end((err, res) => {
+				res.should.have.status(201);
+				res.body.should.be.a('object');
+				res.body.should.have.property('_id').eql(id);
 				done();
 			});
 	});
