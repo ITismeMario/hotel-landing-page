@@ -46,4 +46,13 @@ const getRoom = asyncHandler(async (req, res) => {
 	}
 });
 
-module.exports = { createRoom, getRoom };
+const getRooms = asyncHandler(async (req, res) => {
+	try {
+		const rooms = await Room.find();
+		res.status(201).json(rooms);
+	} catch (error) {
+		throw new Error(error.message);
+	}
+});
+
+module.exports = { createRoom, getRoom, getRooms };
