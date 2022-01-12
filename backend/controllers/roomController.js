@@ -38,10 +38,10 @@ const getRoom = asyncHandler(async (req, res) => {
 		if (room) res.status(201).json(room);
 		else {
 			res.status(404);
-			throw new Error('Room not found');
+			throw new Error('Habitación no encontrada');
 		}
 	} catch (error) {
-		if (error.name === 'CastError') throw new Error('Id inválido');
+		if (error.name === 'CastError') throw new Error('El ID proporcionado no es válido');
 		else throw new Error(error.message);
 	}
 });

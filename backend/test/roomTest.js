@@ -202,6 +202,19 @@ describe('********* Rooms *********', () => {
 			});
 	});
 
+	//GET ROOM
+	it('it should GET a room', (done) => {
+		const id = createdDocumentID.slice(-1).pop();
+		chai.request(server)
+			.get(`/api/rooms/${id}`)
+			.end((err, res) => {
+				res.should.have.status(201);
+				res.body.should.be.a('object');
+				res.body.should.have.property('_id').eql(id);
+				done();
+			});
+	});
+
 	// Clean Up
 	after(() => {
 		createdDocumentID.forEach((id) => {

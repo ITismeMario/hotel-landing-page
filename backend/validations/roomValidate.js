@@ -60,19 +60,10 @@ const validateCreateRoom = [
 ];
 
 const validateGetRoom = [
-	param('id')
-		.exists()
-		.withMessage('Debe proporcionar una habitación')
-		.custom((id) => {
-			const mongoID = id.isMongoId();
-			console.log(`___ID___: ${mongoID}`);
-			if (mongoID) return true;
-			else {
-				throw new Error('Room not found');
-			}
-		})
-		.withMessage('Id inválido'),
-	// .isMongoId().withMessage('La habitación proporcionada no es válida'),
+	param('id').exists().withMessage('Debe de proporcionar un Id').isMongoId().withMessage('Id inválido'), //403
+	(req, res, next) => {
+		validateResult(req, res, next);
+	},
 ];
 
 module.exports = { validateCreateRoom, validateGetRoom };
