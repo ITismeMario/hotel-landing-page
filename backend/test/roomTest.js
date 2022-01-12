@@ -161,7 +161,7 @@ const createTestData = {
 	],
 };
 
-describe('********* Rooms *********', () => {
+describe('*Rooms*', () => {
 	// CREATE ROOM
 	it('it should POST a room', (done) => {
 		chai.request(server)
@@ -220,7 +220,7 @@ describe('********* Rooms *********', () => {
 		createdDocumentID.forEach((id) => {
 			Room.findByIdAndRemove(id, (err) => {
 				if (err) {
-					console.log(err);
+					console.error(err);
 				}
 			});
 		});
