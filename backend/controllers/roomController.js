@@ -55,4 +55,27 @@ const getRooms = asyncHandler(async (req, res) => {
 	}
 });
 
-module.exports = { createRoom, getRoom, getRooms };
+const updateRoom = asyncHandler(async (req, res) => {
+	try {
+		const room = await Room.findById(req.params.id);
+		if (room) {
+			room.name = req.body.name || room.name;
+			room.images = req.body.images || room.images;
+			room.description = req.body.description || room.description;
+			room.price = req.body.price || room.price;
+			room.details = req.body.details || room.details;
+			room.amenities = req.body.amenities || room.amenities;
+
+			const updatedRoom = await room.save();
+			updatedRoom.message = 'Se ha creado la habitación';
+			res.status(201).json(updatedRoom);
+		} else {
+			res.status(404);
+			throw new Error('No se encontró la habitación');
+		}
+	} catch (error) {
+		throw new Error(error.message);
+	}
+});
+
+module.exports = { createRoom, getRoom, getRooms, updateRoom };
