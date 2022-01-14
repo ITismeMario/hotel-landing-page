@@ -210,26 +210,41 @@ const UpdateTestData = {
 
 describe('*Rooms*', () => {
 	// CREATE ROOM
-	it('it should POST a room', (done) => {
-		chai.request(server)
-			.post('/api/rooms/')
-			.set('Authorization', `Bearer ${goodToken}`)
-			.send(createTestData.goodRoom)
-			.end((err, res) => {
-				res.should.have.status(201);
-				res.body.should.be.an('object');
-				res.body.should.include.keys('_id');
-				createdDocumentID.push(res.body._id);
-				done();
-			});
-	});
-
-	createTestData.incompleteRooms.map((room) => {
-		it('it should NOT POST a room with missing data', (done) => {
+	describe('/POST create room', () => {
+		it('it should POST a room', (done) => {
 			chai.request(server)
 				.post('/api/rooms/')
 				.set('Authorization', `Bearer ${goodToken}`)
-				.send(room)
+				.send(createTestData.goodRoom)
+				.end((err, res) => {
+					res.should.have.status(201);
+					res.body.should.be.an('object');
+					res.body.should.include.keys('_id');
+					createdDocumentID.push(res.body._id);
+					done();
+				});
+		});
+
+		createTestData.incompleteRooms.map((room) => {
+			it('it should NOT POST a room with missing data', (done) => {
+				chai.request(server)
+					.post('/api/rooms/')
+					.set('Authorization', `Bearer ${goodToken}`)
+					.send(room)
+					.end((err, res) => {
+						res.should.have.status(403);
+						res.body.should.be.an('object');
+						res.body.should.have.property('errors');
+						done();
+					});
+			});
+		});
+
+		it('it should NOT POST a room with a name already asigned to another room', (done) => {
+			chai.request(server)
+				.post('/api/rooms/')
+				.set('Authorization', `Bearer ${goodToken}`)
+				.send(createTestData.badNameRoom)
 				.end((err, res) => {
 					res.should.have.status(403);
 					res.body.should.be.an('object');
@@ -239,55 +254,60 @@ describe('*Rooms*', () => {
 		});
 	});
 
-	it('it should NOT POST a room with a name already asigned to another room', (done) => {
-		chai.request(server)
-			.post('/api/rooms/')
-			.set('Authorization', `Bearer ${goodToken}`)
-			.send(createTestData.badNameRoom)
-			.end((err, res) => {
-				res.should.have.status(403);
-				res.body.should.be.an('object');
-				res.body.should.have.property('errors');
-				done();
-			});
-	});
-
 	//GET ROOM
-	it('it should GET a room', (done) => {
-		const id = createdDocumentID.slice(-1).pop();
-		chai.request(server)
-			.get(`/api/rooms/${id}`)
-			.end((err, res) => {
-				res.should.have.status(201);
-				res.body.should.be.a('object');
-				res.body.should.have.property('_id').eql(id);
-				done();
-			});
+	describe('/GET get room/s', () => {
+		it('it should GET a room', (done) => {
+			const id = createdDocumentID.slice(-1).pop();
+			chai.request(server)
+				.get(`/api/rooms/${id}`)
+				.end((err, res) => {
+					res.should.have.status(201);
+					res.body.should.be.a('object');
+					res.body.should.have.property('_id').eql(id);
+					done();
+				});
+		});
 	});
 
 	// UPDATE ROOM
-	it('it should PUT a room', (done) => {
-		const id = createdDocumentID.slice(-1).pop();
-		chai.request(server)
-			.put(`/api/rooms/${id}`)
-			.set('Authorization', `Bearer ${goodToken}`)
-			.send(UpdateTestData.goodRoom)
-			.end((err, res) => {
-				res.should.have.status(201);
-				res.body.should.be.an('object');
-				res.body.should.include.keys('_id');
-				createdDocumentID.push(res.body._id);
-				done();
-			});
-	});
-
-	createTestData.incompleteRooms.map((room) => {
-		it('it should NOT PUT a room with missing data', (done) => {
+	describe('/PUT update a room', () => {
+		it('it should PUT a room', (done) => {
 			const id = createdDocumentID.slice(-1).pop();
 			chai.request(server)
 				.put(`/api/rooms/${id}`)
 				.set('Authorization', `Bearer ${goodToken}`)
-				.send(room)
+				.send(UpdateTestData.goodRoom)
+				.end((err, res) => {
+					res.should.have.status(201);
+					res.body.should.be.an('object');
+					res.body.should.include.keys('_id');
+					createdDocumentID.push(res.body._id);
+					done();
+				});
+		});
+
+		createTestData.incompleteRooms.map((room) => {
+			it('it should NOT PUT a room with missing data', (done) => {
+				const id = createdDocumentID.slice(-1).pop();
+				chai.request(server)
+					.put(`/api/rooms/${id}`)
+					.set('Authorization', `Bearer ${goodToken}`)
+					.send(room)
+					.end((err, res) => {
+						res.should.have.status(403);
+						res.body.should.be.an('object');
+						res.body.should.have.property('errors');
+						done();
+					});
+			});
+		});
+
+		it('it should NOT PUT a room with a name already asigned to another room', (done) => {
+			const id = createdDocumentID.slice(-1).pop();
+			chai.request(server)
+				.put(`/api/rooms/${id}`)
+				.set('Authorization', `Bearer ${goodToken}`)
+				.send(UpdateTestData.badNameRoom)
 				.end((err, res) => {
 					res.should.have.status(403);
 					res.body.should.be.an('object');
@@ -295,20 +315,6 @@ describe('*Rooms*', () => {
 					done();
 				});
 		});
-	});
-
-	it('it should NOT PUT a room with a name already asigned to another room', (done) => {
-		const id = createdDocumentID.slice(-1).pop();
-		chai.request(server)
-			.put(`/api/rooms/${id}`)
-			.set('Authorization', `Bearer ${goodToken}`)
-			.send(UpdateTestData.badNameRoom)
-			.end((err, res) => {
-				res.should.have.status(403);
-				res.body.should.be.an('object');
-				res.body.should.have.property('errors');
-				done();
-			});
 	});
 
 	// Clean Up
