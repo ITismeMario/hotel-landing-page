@@ -212,7 +212,8 @@ describe('*Rooms*', () => {
 	// CREATE ROOM
 	it('it should POST a room', (done) => {
 		chai.request(server)
-			.post('/api/rooms/create')
+			.post('/api/rooms/')
+			.set('Authorization', `Bearer ${goodToken}`)
 			.send(createTestData.goodRoom)
 			.end((err, res) => {
 				res.should.have.status(201);
@@ -226,7 +227,8 @@ describe('*Rooms*', () => {
 	createTestData.incompleteRooms.map((room) => {
 		it('it should NOT POST a room with missing data', (done) => {
 			chai.request(server)
-				.post('/api/rooms/create')
+				.post('/api/rooms/')
+				.set('Authorization', `Bearer ${goodToken}`)
 				.send(room)
 				.end((err, res) => {
 					res.should.have.status(403);
@@ -239,7 +241,8 @@ describe('*Rooms*', () => {
 
 	it('it should NOT POST a room with a name already asigned to another room', (done) => {
 		chai.request(server)
-			.post('/api/rooms/create')
+			.post('/api/rooms/')
+			.set('Authorization', `Bearer ${goodToken}`)
 			.send(createTestData.badNameRoom)
 			.end((err, res) => {
 				res.should.have.status(403);

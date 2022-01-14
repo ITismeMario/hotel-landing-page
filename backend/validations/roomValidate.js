@@ -24,6 +24,15 @@ function validateImages(images, allowedExtensions) {
 }
 
 const validateCreateRoom = [
+	header('Authorization')
+		.exists()
+		.withMessage('No token')
+		.customSanitizer((authorization) => {
+			let sanitizedToken = authorization.split(' ')[1];
+			return sanitizedToken;
+		})
+		.isJWT()
+		.withMessage('No valid token was recieved'),
 	check('name')
 		.exists()
 		.withMessage('Es necesario asignar un nombre para el tipo de habitación')
