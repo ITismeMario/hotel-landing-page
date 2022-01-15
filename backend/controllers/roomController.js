@@ -78,4 +78,20 @@ const updateRoom = asyncHandler(async (req, res) => {
 	}
 });
 
-module.exports = { createRoom, getRoom, getRooms, updateRoom };
+const deleteRoom = asyncHandler(async (req, res) => {
+	try {
+		const room = await Room.findById(req.params.id);
+
+		if (room) {
+			await room.remove();
+			res.json({ message: 'Se ha eliminado la habitación' });
+		} else {
+			res.status(404);
+			throw new Error('No se encontró la habitación para elminarla');
+		}
+	} catch (error) {
+		throw new Error(error.message);
+	}
+});
+
+module.exports = { createRoom, getRoom, getRooms, updateRoom, deleteRoom };

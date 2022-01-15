@@ -85,6 +85,7 @@ const validateUpdateRoom = [
 		})
 		.isJWT()
 		.withMessage('No valid token was recieved'),
+	param('id').exists().withMessage('Debe de proporcionar un Id').isMongoId().withMessage('Id inválido'),
 	check('name')
 		.exists()
 		.withMessage('Es necesario asignar un nombre para el tipo de habitación')
@@ -120,4 +121,20 @@ const validateUpdateRoom = [
 	},
 ];
 
-module.exports = { validateCreateRoom, validateGetRoom, validateUpdateRoom };
+const validateDeleteUser = [
+	header('Authorization')
+		.exists()
+		.withMessage('No token')
+		.customSanitizer((authorization) => {
+			let sanitizedToken = authorization.split(' ')[1];
+			return sanitizedToken;
+		})
+		.isJWT()
+		.withMessage('No valid token was recieved'),
+	param('id').exists().withMessage('Debe de proporcionar un Id').isMongoId().withMessage('Id inválido'),
+	(req, res, next) => {
+		validateResult(req, res, next);
+	},
+];
+
+module.exports = { validateCreateRoom, validateGetRoom, validateUpdateRoom, validateDeleteUser };

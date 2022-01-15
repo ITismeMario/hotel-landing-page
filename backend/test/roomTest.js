@@ -317,6 +317,41 @@ describe('*Rooms*', () => {
 		});
 	});
 
+	describe('DELETE  room', () => {
+		it('it should NOT DELETE a room if the user requesting it is not authorized', (done) => {
+			const badToken = 'Definitely.Not.A.Good.JWT';
+			const id = createdDocumentID.slice(-1).pop();
+			chai.request(server)
+				.delete(`/api/rooms${id}`)
+				.set('Authorization', `Bearer ${badToken}`)
+				.end((error, res) => {
+					res.should.have.status(404);
+					done();
+				});
+		});
+
+		it('it should NOT DELETE a room without an Id provided', (done) => {
+			chai.request(server)
+				.delete(`/api/rooms/`)
+				.set('Authorization', `Bearer ${goodToken}`)
+				.end((error, res) => {
+					res.should.have.status(404);
+					done();
+				});
+		});
+
+		it('it should DELETE a room', (done) => {
+			const id = createdDocumentID.slice(-1).pop();
+			chai.request(server)
+				.delete(`/api/rooms/${id}`)
+				.set('Authorization', `Bearer ${goodToken}`)
+				.end((error, res) => {
+					res.should.have.status(200);
+					done();
+				});
+		});
+	});
+
 	// Clean Up
 	after(() => {
 		createdDocumentID.forEach((id) => {
